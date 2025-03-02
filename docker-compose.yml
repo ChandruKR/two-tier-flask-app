@@ -24,8 +24,8 @@ services:
 
 
   flask-app:
-    build:
-      context: .
+    image: chandrukr36/flask-app:latest
+    container_name: flask-app
     ports:
       - "5000:5000"
     environment:
