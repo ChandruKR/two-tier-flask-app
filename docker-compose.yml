@@ -23,7 +23,7 @@ services:
       start_period: 60s
 
 
-  flask-app:
+  flask-app_mine:
     image: chandrukr36/flask-app:latest
     container_name: flask-app
     ports:
