@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Code Stage') {
+        stage('Github Code Stage') {
             steps {
                 git url: "https://github.com/ChandruKR/two-tier-flask-app.git", branch: 'master'
                 script {
@@ -14,9 +14,10 @@ pipeline {
         stage('Build Stage') {
             steps {
                 sh "docker build -t local_flask-app:latest ."
+
             }
         }
-        stage('Test Stage') {
+        stage('Dockerhub tag & push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'Dockerhubid', 
                 passwordVariable: 'dockerHubPassword', 
@@ -31,7 +32,7 @@ pipeline {
         }
         stage('Deploy Stage') {
             steps {
-                sh "docker compose up -d --build flask-app"
+                sh "docker compose up -d "
             }
         }
     }
