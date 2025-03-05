@@ -1,5 +1,5 @@
 pipeline {
-	    agent { label 'TEst' }
+            agent { label 'TEst' }
 
     stages {
         stage('Github Code Stage') {
@@ -19,15 +19,15 @@ pipeline {
         }
         stage('Dockerhub tag & push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'Dockerhubid', 
-                passwordVariable: 'dockerHubPassword', 
+                withCredentials([usernamePassword(credentialsId: 'Dockerhubid',
+                passwordVariable: 'dockerHubPassword',
                 usernameVariable: 'dockerHubUser')]) {
                     sh "docker image tag  local_flask-app:latest   ${env.dockerHubUser}/flask-app:latest"
                     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
                     sh "docker push ${env.dockerHubUser}/flask-app:latest"
-                    
+
                 }
-                
+
             }
         }
         stage('Deploy Under Agent "TEst"') {
@@ -36,4 +36,18 @@ pipeline {
             }
         }
     }
+post {
+    success {
+        emailext body: "Build Successfull",
+            subject: "Build Successfull",
+            to: "ckfordevops0114@gmail.com"
+
+    }
+    failure {
+        emailext body: "Build Failed",
+            subject: "Build Failed",
+            to: "ckfordevops0114@gmail.com"
+
+    }
+}
 }
