@@ -30,7 +30,7 @@ pipeline {
                 
             }
         }
-        stage('Deploy Stage') {
+        stage('Deploy Under Agent "TEst"') {
             steps {
                 sh "docker-compose up -d "
             }
