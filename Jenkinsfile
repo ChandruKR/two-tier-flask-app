@@ -1,6 +1,5 @@
 pipeline {
             agent { label 'TEst' }
-
     stages {
         stage('Github Code Stage') {
             steps {
@@ -11,7 +10,14 @@ pipeline {
                 }
             }
         }
-        stage('Build Stage') {
+        
+        stage('Trivy file system scan') {
+            steps {
+                sh "trivy fs . -o results.json"
+
+            }
+        }
+                stage('Build Stage') {
             steps {
                 sh "docker build -t local_flask-app:latest ."
 
@@ -38,16 +44,16 @@ pipeline {
     }
 post {
     success {
-        emailext body: "Build Successfull",
+        emailext body: "Build Successfull", attachLog: true,
             subject: "Build Successfull",
             to: "ckfordevops0114@gmail.com"
 
     }
     failure {
-        emailext body: "Build Failed",
-            subject: "Build Failed",
-            to: "ckfordevops0114@gmail.com"
-
+        emailext body: "Build Failed", attachLog: true,
+        from: "noreplychandru@gmail.com",
+        subject: "Build Failed",
+        to: "ckfordevops0114@gmail.com"
     }
 }
 }
