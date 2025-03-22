@@ -10,6 +10,7 @@ pipeline {
                 }
             }
         }
+
         
         stage('Trivy file system scan') {
             steps {
@@ -23,6 +24,18 @@ pipeline {
 
             }
         }
+        
+                stage('Trivy Image Scan') {
+            steps {
+            script {
+                def scanOutput = sh(returnStatus: true, script: 'trivy image --exit-code 1 --severity CRITICAL local_flask-app:latest')
+                if (scanOutput != 0) {
+                    error("Critical vulnerabilities found in the image. Failing the build.")
+                }
+            }
+        }
+        }
+        
         stage('Dockerhub tag & push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'Dockerhubid',
@@ -44,15 +57,16 @@ pipeline {
     }
 post {
     success {
-        emailext body: "Build Successfull", attachLog: true,
-            subject: "Build Successfull",
+        emailext body: "The build has completed successfully. Check details at: ${env.BUILD_URL}", attachLog: true,
+            subject: "Build Notification: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
             to: "ckfordevops0114@gmail.com"
 
     }
     failure {
-        emailext body: "Build Failed", attachLog: true,
+        emailext body: "Build Failed. Check details at: ${env.BUILD_URL} WORKSPACE: ${WORKSPACE}", attachLog: true,
         from: "noreplychandru@gmail.com",
-        subject: "Build Failed",
+        subject: "Build Notification: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+        recipientProviders: [[$class: 'DevelopersRecipientProvider']],
         to: "ckfordevops0114@gmail.com"
     }
 }
